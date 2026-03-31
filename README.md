@@ -2,6 +2,11 @@
 
 自动将顽鹿的骑行数据同步到 Strava。
 
+## 项目背景
+
+顽鹿运动（Onelap）此前支持将运动数据自动同步至 Strava，但该功能于 2026 年 3 月 19 日关闭。本项目旨在恢复这一功能，通过 API 自动将顽鹿的骑行数据同步到 Strava。
+
+
 ## 功能
 
 - **顽鹿登录认证**: 使用 MD5 签名安全登录
@@ -58,7 +63,11 @@ go build -o MageneSync main.go
 }
 ```
 
-> **说明**: Strava 部分初期只需要填写 `client_id` 和 `client_secret`，后面的 token 及过期时间会在授权流程完成后由程序自动补充。
+> **为什么填写了 client_id 和 client_secret 后还需要授权？**
+> 1. `client_id` 和 `client_secret` 是你的 **Strava API 应用凭证**，用于向 Strava 标识本程序。
+> 2. **授权流程**（执行 `auth` 命令）是由于 Strava 的安全机制，需要你作为 **用户** 亲自同意授权给该应用上传数据的权限。
+> 3. 授权成功后，程序会自动获取 `access_token` 和 `refresh_token` 并保存到 `config.json` 中，之后即可实现全自动同步，无需再次手动授权。
+
 
 ## 使用教程
 
