@@ -1,0 +1,69 @@
+package config
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+type OnelapConfig struct {
+	Account  string `json:"account"`
+	Password string `json:"password"`
+}
+
+type StravaConfig struct {
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresAt    int64  `json:"expires_at"` // Unix timestamp
+}
+
+type Config struct {
+	Onelap OnelapConfig `json:"onelap"`
+	Strava StravaConfig `json:"strava"`
+}
+
+var GlobalConfig Config
+
+func LoadConfig(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("failed to read config file: %w", err)
+		}
+	} else {
+		if err := json.Unmarshal(data, &GlobalConfig); err != nil {
+			return fmt.Errorf("failed to unmarshal config: %w", err)
+		}
+	}
+
+	// Override with environment variables
+	if v := os.Getenv("ONELAP_ACCOUNT"); v != "" {
+		GlobalConfig.Onelap.Account = v
+	}
+	if v := os.Getenv("ONELAP_PASSWORD"); v != "" {
+		GlobalConfig.Onelap.Password = v
+	}
+	if v := os.Getenv("STRAVA_CLIENT_ID"); v != "" {
+		GlobalConfig.Strava.ClientID = v
+	}
+	if v := os.Getenv("STRAVA_CLIENT_SECRET"); v != "" {
+		GlobalConfig.Strava.ClientSecret = v
+	}
+
+	return nil
+}
+
+func SaveConfig(path string) error {
+	data, err := json.MarshalIndent(GlobalConfig, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
+}

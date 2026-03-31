@@ -1,0 +1,13 @@
+{
+  "onelap": {
+    "account": "YOUR_ONELAP_ACCOUNT",
+    "password": "YOUR_ONELAP_PASSWORD"
+  },
+  "strava": {
+    "client_id": "YOUR_STRAVA_CLIENT_ID",
+    "client_secret": "YOUR_STRAVA_CLIENT_SECRET",
+    "access_token": "",
+    "refresh_token": "",
+    "expires_at": 0
+  }
+}

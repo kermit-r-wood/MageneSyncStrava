@@ -1,0 +1,27 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+MageneSync
+
+# Configuration and State
+config.json
+state.json
+
+# Tooling and Temp
+tmp/
+.agents/data/
+.agents/logs/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Go
+vendor/
+*.test
+*.out
