@@ -5,35 +5,42 @@
 ## 功能
 
 - **顽鹿登录认证**: 使用 MD5 签名安全登录
-- **活动筛选**: 自动筛选当天的骑行记录
-- **FIT 文件处理**: 下载 FIT 格式的活动数据（骑行数据最丰富的格式）
-- **Strava OAuth**: 自动刷新 Strava 访问令牌，无需手动维护
-- **内置授权流程**: 一条命令完成 Strava OAuth 授权，无需手动复制 token
-- **持久化配置**: 凭证和令牌保存在 `config.json` 中，自动更新
+- **活动筛选**: 自动提取并过滤尚未同步的当天骑行记录
+- **FIT 文件处理**: 获取最完整的 FIT 格式的活动数据并上传
+- **Strava OAuth**: 自动验证并刷新 Strava 访问令牌，无需手动维护
+- **多种运行模式**: 提供 `sync`, `auth`, `check` 和 `status` 等多种子命令，方便配置和调试
+- **本地状态管理**: 同步记录及访问令牌持久化保存在本地 (`state.json` 和 `config.json`)，避免重复上传
+- **Agent 专属向导**: 内置 `sync_wizard` Skill，支持 AI 助手一步步引导完成环境和配置搭建
 
 ## 前置要求
 
-- Go 1.21+
 - 顽鹿账号
 - Strava API 应用（[在此创建](https://www.strava.com/settings/api)）
   - **重要配置**：在 Strava 设置页面，将 **Authorization Callback Domain** 设置为 `localhost`。
   - 创建后获取 `Client ID` 和 `Client Secret`。
 
+## 下载与安装
 
-## 使用步骤
+### 使用预编译的二进制（推荐）
 
-### 1. 克隆并构建
+可以通过 Github Actions 下载自动构建好的最新二进制文件。支持 Windows, macOS 和 Linux 平台。
+[前往下载 Releases](https://github.com/kermit-r-wood/MageneSyncStrava/releases) 或者在 Actions 详情页面下载 Artifacts。
+
+### 源码编译
+
+需要 Go 1.21+ 环境:
 
 ```bash
-git clone <repo-url>
-cd MageneSync
-go mod tidy
-go build -o MageneSync.exe .
+git clone https://github.com/kermit-r-wood/MageneSyncStrava.git
+cd MageneSyncStrava
+make build
+# 或者直接使用 go 命令编译
+go build -o MageneSync main.go
 ```
 
-### 2. 配置
+## 配置指南
 
-将 `config.sample.json` 复制为 `config.json`，填入你的凭证：
+将项目根目录下的 `config.sample.json` 复制并重命名为 `config.json`，按需填入你的凭证：
 
 ```json
 {
@@ -51,62 +58,85 @@ go build -o MageneSync.exe .
 }
 ```
 
-> **说明**: Strava 部分只需要填写 `client_id` 和 `client_secret`，token 会在下一步自动获取。
+> **说明**: Strava 部分初期只需要填写 `client_id` 和 `client_secret`，后面的 token 及过期时间会在授权流程完成后由程序自动补充。
 
-### 3. 授权 Strava
+## 使用教程
 
-运行内置的授权命令：
+基础命令格式：
+```bash
+./MageneSync [command]
+```
+（如果不加 `[command]`，默认执行 `sync` 任务）
+
+### 1. 检查配置 (`check`)
+
+配置完毕后，首先运行 `check` 命令检查连通性是否正常：
 
 ```bash
-# 使用 go run
-go run . auth
-
-# 或使用编译后的二进制
-./MageneSync.exe auth
+./MageneSync check
 ```
+程序将分别测试 顽鹿 以及 Strava API 的连接状态及凭据有效性。
 
-程序会自动打开浏览器跳转到 Strava 授权页面。
-**重要**：请确保在授权页面勾选 **「Upload your activities and posts to Strava」** 权限，否则程序无法上传数据。
+### 2. 授权 Strava (`auth`)
 
-授权成功后，Token 会自动保存到 `config.json`。此操作只需执行**一次**。
-
-
-## 日常使用
+使用此命令启动内置验证服务进行 Strava 授权（由于访问限制，初次运行必须执行此步）：
 
 ```bash
-# 直接运行
-go run .
-
-# 或使用编译后的二进制
-./MageneSync.exe
+./MageneSync auth
 ```
 
-程序会依次执行：
+程序会自动打开浏览器并前往 Strava 进行授权。
+**重要**：授权请求中必须勾选 **「Upload your activities and posts to Strava」**，否则即使成功拉取也不能上传数据。
+授权完成后，Token 会自动写入至 `config.json` 中保存，以后无需再重复操作。
 
+*（提示：如果是运行在无头远程服务器等无法浏览器重定向的环境，你可以将终端输出的授权链接复制到本地浏览器中访问，授权同意之后再把最终报错跳转地址附带的 `?code=xxx` 重新手动回调请求给程序即可生效，或者请求智能助手帮忙代理处理。）*
+
+### 3. 数据同步 (`sync`)
+
+直接运行主程序或者附带 sync 参数，执行数据同步：
+
+```bash
+./MageneSync sync
+```
+
+该模式会：
 1. 登录顽鹿
-2. 获取今天的骑行记录
-3. 下载 FIT 文件到临时目录
-4. 刷新 Strava 访问令牌（如已过期）
-5. 将 FIT 文件上传到 Strava
-6. 清理临时文件
+2. 获取当天的骑行活动
+3. 判断是否已在 `state.json` 中标记为同步完成，从而过滤重复任务
+4. 检查并刷新 Strava 令牌（如失效）
+5. 下载对应的 FIT 文件并将其上传到 Strava
+6. 更新本地持久化记录 `state.json`
+
+### 4. 查看状态 (`status`)
+
+你可以随时通过此命令快速检查当前环境配置文件和历史同步情况：
+
+```bash
+./MageneSync status
+```
+展示当前的账户设定、Strava验证状态，以及历史成功同步的骑行活动条目数。
 
 ## 定时执行（可选）
 
-可以使用 **Windows 任务计划程序** 定时运行 `MageneSync.exe`（例如每天晚上），实现全自动同步。
+建议通过计划任务实现全自动后台同步。
+- **Windows**: 使用 **任务计划程序** 定时执行 `MageneSync.exe`。
+- **Linux/macOS**: 配置 `crontab` 定时任务（例如每日晚间定期执行一次）。
 
 ## 项目结构
 
 ```
 MageneSync/
-├── main.go                     # 入口，子命令路由
-├── config.json                 # 运行时配置（不提交到 git）
-├── config.sample.json          # 配置模板
+├── main.go                     # 项目入口与命令路透
+├── config.json                 # 运行配置文件（需手动创建，勿提交）
+├── config.sample.json          # 模板配置文件
+├── state.json                  # 已同步记录状态（自动生成）
+├── Makefile                    # 快捷构建脚本
+├── .github/workflows/          # CI/CD 自动发布配置
+├── .agents/skills/sync_wizard/ # 针对 Agent 辅助工具的使用指南
 ├── internal/
-│   ├── config/config.go        # 配置加载与保存
-│   ├── onelap/onelap.go        # 顽鹿 API 客户端
-│   └── strava/
-│       ├── strava.go           # Strava 上传与令牌刷新
-│       └── auth.go             # Strava OAuth 授权流程
+│   ├── config/                 # 负责读取配置和记录同步状态 
+│   ├── onelap/                 # 顽鹿 API 客户端代码逻辑
+│   └── strava/                 # Strava OAuth 与上传交互实现
 ├── go.mod
 └── go.sum
 ```
