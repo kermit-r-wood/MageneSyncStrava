@@ -2,7 +2,7 @@ BINARY_NAME=MageneSync.exe
 
 .PHONY: build
 build:
-	go build -o $(BINARY_NAME) main.go
+	go build -ldflags="-s -w" -o $(BINARY_NAME) main.go
 
 .PHONY: sync
 sync: build

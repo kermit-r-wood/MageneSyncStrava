@@ -26,8 +26,14 @@ type Client struct {
 }
 
 func NewClient() *Client {
+	client := resty.New().
+		SetTimeout(30 * time.Second).
+		SetRetryCount(3).
+		SetRetryWaitTime(2 * time.Second).
+		SetRetryMaxWaitTime(10 * time.Second)
+
 	return &Client{
-		restyClient: resty.New().SetTimeout(30 * time.Second),
+		restyClient: client,
 	}
 }
 
