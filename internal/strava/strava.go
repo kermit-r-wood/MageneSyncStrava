@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"MageneSync/internal/config"
+	"OnelapSyncStrava/internal/config"
 	"github.com/go-resty/resty/v2"
 )
 

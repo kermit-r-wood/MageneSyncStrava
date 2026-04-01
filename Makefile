@@ -1,4 +1,4 @@
-BINARY_NAME=MageneSync.exe
+BINARY_NAME=OnelapSyncStrava.exe
 
 .PHONY: build
 build:

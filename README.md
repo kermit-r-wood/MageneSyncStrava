@@ -1,4 +1,4 @@
-# MageneSync
+# OnelapSyncStrava
 
 自动将顽鹿的骑行数据同步到 Strava。
 
@@ -29,18 +29,18 @@
 ### 使用预编译的二进制（推荐）
 
 可以通过 Github Actions 下载自动构建好的最新二进制文件。支持 Windows, macOS 和 Linux 平台。
-[前往下载 Releases](https://github.com/kermit-r-wood/MageneSyncStrava/releases) 或者在 Actions 详情页面下载 Artifacts。
+[前往下载 Releases](https://github.com/kermit-r-wood/OnelapSyncStrava/releases) 或者在 Actions 详情页面下载 Artifacts。
 
 ### 源码编译
 
 需要 Go 1.21+ 环境:
 
 ```bash
-git clone https://github.com/kermit-r-wood/MageneSyncStrava.git
-cd MageneSyncStrava
+git clone https://github.com/kermit-r-wood/OnelapSyncStrava.git
+cd OnelapSyncStrava
 make build
 # 或者直接使用 go 命令编译
-go build -o MageneSync main.go
+go build -o OnelapSyncStrava main.go
 ```
 
 ## 配置指南
@@ -73,7 +73,7 @@ go build -o MageneSync main.go
 
 基础命令格式：
 ```bash
-./MageneSync [command]
+./OnelapSyncStrava [command]
 ```
 （如果不加 `[command]`，默认执行 `sync` 任务）
 
@@ -82,7 +82,7 @@ go build -o MageneSync main.go
 配置完毕后，首先运行 `check` 命令检查连通性是否正常：
 
 ```bash
-./MageneSync check
+./OnelapSyncStrava check
 ```
 程序将分别测试 顽鹿 以及 Strava API 的连接状态及凭据有效性。
 
@@ -91,7 +91,7 @@ go build -o MageneSync main.go
 使用此命令启动内置验证服务进行 Strava 授权（由于访问限制，初次运行必须执行此步）：
 
 ```bash
-./MageneSync auth
+./OnelapSyncStrava auth
 ```
 
 程序会自动打开浏览器并前往 Strava 进行授权。
@@ -105,7 +105,7 @@ go build -o MageneSync main.go
 直接运行主程序或者附带 sync 参数，执行数据同步：
 
 ```bash
-./MageneSync sync
+./OnelapSyncStrava sync
 ```
 
 该模式会：
@@ -121,20 +121,20 @@ go build -o MageneSync main.go
 你可以随时通过此命令快速检查当前环境配置文件和历史同步情况：
 
 ```bash
-./MageneSync status
+./OnelapSyncStrava status
 ```
 展示当前的账户设定、Strava验证状态，以及历史成功同步的骑行活动条目数。
 
 ## 定时执行（可选）
 
 建议通过计划任务实现全自动后台同步。
-- **Windows**: 使用 **任务计划程序** 定时执行 `MageneSync.exe`。
+- **Windows**: 使用 **任务计划程序** 定时执行 `OnelapSyncStrava.exe`。
 - **Linux/macOS**: 配置 `crontab` 定时任务（例如每日晚间定期执行一次）。
 
 ## 项目结构
 
 ```
-MageneSync/
+OnelapSyncStrava/
 ├── main.go                     # 项目入口与命令路透
 ├── config.json                 # 运行配置文件（需手动创建，勿提交）
 ├── config.sample.json          # 模板配置文件

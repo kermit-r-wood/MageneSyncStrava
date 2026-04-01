@@ -1,4 +1,4 @@
-module MageneSync
+module OnelapSyncStrava
 
 go 1.25.4
 

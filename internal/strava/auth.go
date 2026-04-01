@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"MageneSync/internal/config"
+	"OnelapSyncStrava/internal/config"
 )
 
 // Authorize starts a local HTTP server, opens the browser for Strava OAuth,

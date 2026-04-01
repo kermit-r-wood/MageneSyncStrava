@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MageneSync/internal/config"
+	"OnelapSyncStrava/internal/config"
 )
 
 const testConfigPath = "../../config.json"

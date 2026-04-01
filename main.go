@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"MageneSync/internal/config"
-	"MageneSync/internal/onelap"
-	"MageneSync/internal/strava"
+	"OnelapSyncStrava/internal/config"
+	"OnelapSyncStrava/internal/onelap"
+	"OnelapSyncStrava/internal/strava"
 )
 
 const (
@@ -50,9 +50,10 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Println("MageneSync - Sync Onelap activities to Strava")
-	fmt.Println("\nUsage:")
-	fmt.Println("  MageneSync [command]")
+	fmt.Println("OnelapSyncStrava - Sync Onelap activities to Strava")
+	fmt.Println()
+	fmt.Println("Usage:")
+	fmt.Println("  OnelapSyncStrava [command]")
 	fmt.Println("\nAvailable Commands:")
 	fmt.Println("  sync    (default) Fetch today's activities and upload to Strava")
 	fmt.Println("  auth    Run Strava OAuth flow to get access tokens")
