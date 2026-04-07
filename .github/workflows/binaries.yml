@@ -43,7 +43,7 @@ jobs:
       - name: Build Binary
         shell: bash
         run: |
-          BINARY_NAME="MageneSync-${{ matrix.goos }}-${{ matrix.goarch }}"
+          BINARY_NAME="OnelapSyncStrava-${{ matrix.goos }}-${{ matrix.goarch }}"
           if [ "${{ matrix.goos }}" = "windows" ]; then
             BINARY_NAME="${BINARY_NAME}.exe"
           fi
@@ -53,7 +53,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MageneSync-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: OnelapSyncStrava-${{ matrix.goos }}-${{ matrix.goarch }}
           path: ${{ env.BINARY_PATH }}
 
   release:
